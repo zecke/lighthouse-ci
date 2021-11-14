@@ -6,6 +6,7 @@
 'use strict';
 
 const {hashAdminToken, generateAdminToken} = require('../../auth.js');
+const {getTable} = require('../utils.js');
 
 /* eslint-disable new-cap */
 
@@ -13,11 +14,13 @@ module.exports = {
   /**
    * @param {import('sequelize').QueryInterface} queryInterface
    * @param {typeof import('sequelize')} Sequelize
+   * @param {LHCI.ServerCommand.StorageOptions} options
    */
-  up: async (queryInterface, Sequelize) => {
-    await queryInterface.addColumn('projects', 'adminToken', {type: Sequelize.STRING(64)});
+  up: async (queryInterface, Sequelize, options) => {
+    const projects = getTable('projects', options);
+    await queryInterface.addColumn(projects, 'adminToken', {type: Sequelize.STRING(64)});
     await queryInterface.bulkUpdate(
-      'projects',
+      projects,
       // Because of the useless salt, this will be an invalid admin token that requires resetting
       // via the wizard command, but our goal is exactly to create an initial token no one can guess.
       {adminToken: hashAdminToken(generateAdminToken(), '0')},
@@ -27,8 +30,11 @@ module.exports = {
   },
   /**
    * @param {import('sequelize').QueryInterface} queryInterface
+   * @param {typeof import('sequelize')} Sequelize
+   * @param {LHCI.ServerCommand.StorageOptions} options
    */
-  down: async queryInterface => {
-    await queryInterface.removeColumn('projects', 'adminToken');
+  down: async (queryInterface, Sequelize, options) => {
+    const projects = getTable('projects', options);
+    await queryInterface.removeColumn(projects, 'adminToken');
   },
 };

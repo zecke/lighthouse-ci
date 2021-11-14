@@ -5,17 +5,21 @@
  */
 'use strict';
 
+const {getTable} = require('../utils.js');
+
 /* eslint-disable new-cap */
 
 module.exports = {
   /**
    * @param {import('sequelize').QueryInterface} queryInterface
    * @param {typeof import('sequelize')} Sequelize
+   * @param {LHCI.ServerCommand.StorageOptions} options
    */
-  up: async (queryInterface, Sequelize) => {
-    await queryInterface.addColumn('statistics', 'version', {type: Sequelize.NUMERIC(8, 2)});
+  up: async (queryInterface, Sequelize, options) => {
+    const statistics = getTable('statistics', options);
+    await queryInterface.addColumn(statistics, 'version', {type: Sequelize.NUMERIC(8, 2)});
     await queryInterface.bulkUpdate(
-      'statistics',
+      statistics,
       {version: 1},
       {version: null},
       {type: Sequelize.QueryTypes.BULKUPDATE}
@@ -23,8 +27,11 @@ module.exports = {
   },
   /**
    * @param {import('sequelize').QueryInterface} queryInterface
+   * @param {typeof import('sequelize')} Sequelize
+   * @param {LHCI.ServerCommand.StorageOptions} options
    */
-  down: async queryInterface => {
-    await queryInterface.removeColumn('statistics', 'version');
+  down: async (queryInterface, Sequelize, options) => {
+    const statistics = getTable('statistics', options);
+    await queryInterface.removeColumn(statistics, 'version');
   },
 };

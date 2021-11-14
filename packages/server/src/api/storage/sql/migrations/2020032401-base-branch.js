@@ -5,17 +5,21 @@
  */
 'use strict';
 
+const {getTable} = require('../utils.js');
+
 /* eslint-disable new-cap */
 
 module.exports = {
   /**
    * @param {import('sequelize').QueryInterface} queryInterface
    * @param {typeof import('sequelize')} Sequelize
+   * @param {LHCI.ServerCommand.StorageOptions} options
    */
-  up: async (queryInterface, Sequelize) => {
-    await queryInterface.addColumn('projects', 'baseBranch', {type: Sequelize.STRING(80)});
+  up: async (queryInterface, Sequelize, options) => {
+    const projects = getTable('projects', options);
+    await queryInterface.addColumn(projects, 'baseBranch', {type: Sequelize.STRING(80)});
     await queryInterface.bulkUpdate(
-      'projects',
+      projects,
       {baseBranch: 'master'},
       {baseBranch: null},
       {type: Sequelize.QueryTypes.BULKUPDATE}
@@ -23,8 +27,11 @@ module.exports = {
   },
   /**
    * @param {import('sequelize').QueryInterface} queryInterface
+   * @param {typeof import('sequelize')} Sequelize
+   * @param {LHCI.ServerCommand.StorageOptions} options
    */
-  down: async queryInterface => {
-    await queryInterface.removeColumn('projects', 'baseBranch');
+  down: async (queryInterface, Sequelize, options) => {
+    const projects = getTable('projects', options);
+    await queryInterface.removeColumn(projects, 'baseBranch');
   },
 };

@@ -5,22 +5,29 @@
  */
 'use strict';
 
+const {getTable} = require('../utils.js');
+
 /* eslint-disable new-cap */
 
 module.exports = {
   /**
    * @param {import('sequelize').QueryInterface} queryInterface
    * @param {typeof import('sequelize')} Sequelize
+   * @param {LHCI.ServerCommand.StorageOptions} options
    */
-  up: async (queryInterface, Sequelize) => {
-    await queryInterface.addColumn('builds', 'committedAt', {type: Sequelize.DATE(6)});
-    await queryInterface.addColumn('builds', 'ancestorCommittedAt', {type: Sequelize.DATE(6)});
+  up: async (queryInterface, Sequelize, options) => {
+    const builds = getTable('builds', options);
+    await queryInterface.addColumn(builds, 'committedAt', {type: Sequelize.DATE(6)});
+    await queryInterface.addColumn(builds, 'ancestorCommittedAt', {type: Sequelize.DATE(6)});
   },
   /**
    * @param {import('sequelize').QueryInterface} queryInterface
+   * @param {typeof import('sequelize')} Sequelize
+   * @param {LHCI.ServerCommand.StorageOptions} options
    */
-  down: async queryInterface => {
-    await queryInterface.removeColumn('builds', 'committedAt');
-    await queryInterface.removeColumn('builds', 'ancestorCommittedAt');
+  down: async (queryInterface, Sequelize, options) => {
+    const builds = getTable('builds', options);
+    await queryInterface.removeColumn(builds, 'committedAt');
+    await queryInterface.removeColumn(builds, 'ancestorCommittedAt');
   },
 };

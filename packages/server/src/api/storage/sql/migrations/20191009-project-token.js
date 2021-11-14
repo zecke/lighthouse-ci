@@ -5,15 +5,19 @@
  */
 'use strict';
 
+const {getTable} = require('../utils.js');
+
 /* eslint-disable new-cap */
 
 module.exports = {
   /**
    * @param {import('sequelize').QueryInterface} queryInterface
    * @param {typeof import('sequelize')} Sequelize
+   * @param {LHCI.ServerCommand.StorageOptions} options
    */
-  up: async (queryInterface, Sequelize) => {
-    await queryInterface.addColumn('projects', 'token', {type: Sequelize.UUID()});
+  up: async (queryInterface, Sequelize, options) => {
+    const projects = getTable('projects', options);
+    await queryInterface.addColumn(projects, 'token', {type: Sequelize.UUID()});
     await queryInterface.bulkUpdate(
       'projects',
       {token: Sequelize.col('id')},
@@ -23,8 +27,11 @@ module.exports = {
   },
   /**
    * @param {import('sequelize').QueryInterface} queryInterface
+   * @param {typeof import('sequelize')} Sequelize
+   * @param {LHCI.ServerCommand.StorageOptions} options
    */
-  down: async queryInterface => {
-    await queryInterface.removeColumn('projects', 'token');
+  down: async (queryInterface, Sequelize, options) => {
+    const projects = getTable('projects', options);
+    await queryInterface.removeColumn(projects, 'token');
   },
 };

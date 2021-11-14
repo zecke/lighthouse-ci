@@ -5,22 +5,26 @@
  */
 'use strict';
 
+const {getTable} = require('../utils.js');
+
 /* eslint-disable new-cap */
 
 module.exports = {
   /**
    * @param {import('sequelize').QueryInterface} queryInterface
    * @param {typeof import('sequelize')} Sequelize
+   * @param {LHCI.ServerCommand.StorageOptions} options
    */
-  up: async (queryInterface, Sequelize) => {
-    await queryInterface.addColumn('projects', 'slug', {type: Sequelize.STRING(40)});
+  up: async (queryInterface, Sequelize, options) => {
+    const projects = getTable('projects', options);
+    await queryInterface.addColumn(projects, 'slug', {type: Sequelize.STRING(40)});
     await queryInterface.bulkUpdate(
-      'projects',
+      projects,
       {slug: Sequelize.col('id')},
       {slug: null},
       {type: Sequelize.QueryTypes.BULKUPDATE}
     );
-    await queryInterface.addIndex('projects', {
+    await queryInterface.addIndex(projects, {
       // @ts-ignore - Sequelize types are out of date
       name: 'projects_unique_slug',
       unique: true,
@@ -29,9 +33,12 @@ module.exports = {
   },
   /**
    * @param {import('sequelize').QueryInterface} queryInterface
+   * @param {typeof import('sequelize')} Sequelize
+   * @param {LHCI.ServerCommand.StorageOptions} options
    */
-  down: async queryInterface => {
-    await queryInterface.removeIndex('projects', 'projects_unique_slug');
-    await queryInterface.removeColumn('projects', 'slug');
+  down: async (queryInterface, Sequelize, options) => {
+    const projects = getTable('projects', options);
+    await queryInterface.removeIndex(projects, 'projects_unique_slug');
+    await queryInterface.removeColumn(projects, 'slug');
   },
 };
